@@ -1,0 +1,200 @@
+# ============================================
+# Java / Compile
+# ============================================
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# Gradle
+# ============================================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# ============================================
+# Maven (혹시라도 혼용 시)
+# ============================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ============================================
+# Spring Boot
+# ============================================
+out/
+*.original
+HELP.md
+
+# ============================================
+# IntelliJ IDEA
+# ============================================
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# ============================================
+# Eclipse
+# ============================================
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# ============================================
+# VS Code
+# ============================================
+.vscode/
+*.code-workspace
+.history/
+
+# ============================================
+# NetBeans
+# ============================================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ============================================
+# macOS
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ============================================
+# Windows
+# ============================================
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ============================================
+# Linux
+# ============================================
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log.*
+*.log
+spring.log
+
+# ============================================
+# Environment / Secrets
+# ============================================
+.env
+.env.local
+.env.*.local
+application-local.yml
+application-local.yaml
+application-local.properties
+application-secret.yml
+application-secret.yaml
+application-secret.properties
+*.pem
+*.key
+*.cert
+*.crt
+secrets/
+
+# ============================================
+# Testing / Coverage
+# ============================================
+.jacoco/
+jacoco.exec
+*.exec
+coverage/
+test-output/
+*.lcov
+
+# ============================================
+# H2 Database (런타임 파일)
+# ============================================
+*.db
+*.mv.db
+*.trace.db
+*.lock.db
+
+# ============================================
+# Claude / AI Tools
+# ============================================
+.claude/
+CLAUDE.local.md
+.aider*
+.cursor/
+.cursorrules
+.continue/
+.copilot/
+.ai/
+CLAUDE.md
+
+# ============================================
+# 기타 도구
+# ============================================
+.idea/sonarlint/
+.sonar/
+.scannerwork/
+node_modules/
+package-lock.json
+yarn.lock
