@@ -1,5 +1,7 @@
 package com.switchwon.common.util;
 
+import com.switchwon.common.exception.BusinessException;
+import com.switchwon.common.exception.CommonErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -83,25 +85,29 @@ class MoneyCalculatorTest {
     }
 
     @Test
-    @DisplayName("환율이_0이면_외화_환산은_IllegalArgumentException이다")
-    void 환율이_0이면_외화_환산은_IllegalArgumentException이다() {
+    @DisplayName("환율이_0이면_외화_환산은_INVALID_RATE_BusinessException이다")
+    void 환율이_0이면_외화_환산은_INVALID_RATE_BusinessException이다() {
         assertThatThrownBy(() ->
                 MoneyCalculator.toForex(new BigDecimal("100"), BigDecimal.ZERO))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(CommonErrorCode.INVALID_RATE);
     }
 
     @Test
-    @DisplayName("null_입력은_IllegalArgumentException이다")
-    void null_입력은_IllegalArgumentException이다() {
+    @DisplayName("null_입력은_INVALID_DATA_BusinessException이다")
+    void null_입력은_INVALID_DATA_BusinessException이다() {
         assertThatThrownBy(() -> MoneyCalculator.roundRate(null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(CommonErrorCode.INVALID_DATA);
         assertThatThrownBy(() -> MoneyCalculator.buyRate(null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class);
         assertThatThrownBy(() -> MoneyCalculator.sellRate(null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class);
         assertThatThrownBy(() -> MoneyCalculator.toKrw(null, BigDecimal.ONE))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class);
         assertThatThrownBy(() -> MoneyCalculator.toForex(BigDecimal.ONE, null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class);
     }
 }
