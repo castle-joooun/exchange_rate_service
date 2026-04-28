@@ -67,4 +67,4 @@ logging:
     com.switchwon: DEBUG
     org.hibernate.SQL: DEBUG
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [traceId=%X{traceId:-NONE}] %-5level %logger{36} - %msg%n"
