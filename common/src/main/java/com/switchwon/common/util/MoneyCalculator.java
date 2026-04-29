@@ -58,6 +58,19 @@ public final class MoneyCalculator {
         return forexAmount.multiply(appliedRate).setScale(KRW_SCALE, RoundingMode.FLOOR);
     }
 
+    /**
+     * JPY 1엔 단위로 입력된 금액을 100엔 단위 환율로 KRW 환산한다.
+     * 예: 1000엔 × (rate per 100JPY) = 1000/100 × rate
+     *
+     * 주의: 호출자는 사전에 forexAmount &gt;= 100 임을 보장해야 한다.
+     */
+    public static BigDecimal toKrwFromJpy(BigDecimal jpyAmount, BigDecimal rateOf100Yen) {
+        requireNonNull(jpyAmount, "jpyAmount");
+        requireNonNull(rateOf100Yen, "rateOf100Yen");
+        return jpyAmount.multiply(rateOf100Yen)
+                .divide(JPY_UNIT, KRW_SCALE, RoundingMode.FLOOR);
+    }
+
     public static BigDecimal toForex(BigDecimal krwAmount, BigDecimal appliedRate) {
         requireNonNull(krwAmount, "krwAmount");
         requireNonNull(appliedRate, "appliedRate");

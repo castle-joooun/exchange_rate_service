@@ -77,6 +77,26 @@ class MoneyCalculatorTest {
     }
 
     @Test
+    @DisplayName("JPY_1엔_기준_1000엔을_100엔_환율_910_50으로_환산하면_9105_KRW다")
+    void JPY_1엔_기준_1000엔을_100엔_환율_910_50으로_환산하면_9105_KRW다() {
+        BigDecimal krw = MoneyCalculator.toKrwFromJpy(
+                new BigDecimal("1000"), new BigDecimal("910.50"));
+
+        // 1000 × 910.50 / 100 = 9105.00 → floor → 9105
+        assertThat(krw).isEqualByComparingTo("9105");
+    }
+
+    @Test
+    @DisplayName("JPY_133엔을_100엔_환율_910_50으로_환산하면_floor_적용되어_1210_KRW다")
+    void JPY_133엔을_100엔_환율_910_50으로_환산하면_floor_적용되어_1210_KRW다() {
+        // 133 × 910.50 / 100 = 1210.965 → floor → 1210
+        BigDecimal krw = MoneyCalculator.toKrwFromJpy(
+                new BigDecimal("133"), new BigDecimal("910.50"));
+
+        assertThat(krw).isEqualByComparingTo("1210");
+    }
+
+    @Test
     @DisplayName("KRW_금액을_환율로_나누어_외화로_환산할_수_있다")
     void KRW_금액을_환율로_나누어_외화로_환산할_수_있다() {
         BigDecimal forex = MoneyCalculator.toForex(new BigDecimal("296086"), new BigDecimal("1480.43"));
