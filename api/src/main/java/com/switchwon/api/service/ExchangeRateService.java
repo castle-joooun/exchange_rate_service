@@ -12,10 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 환율 조회 서비스.
@@ -24,11 +23,16 @@ import java.util.List;
  * 분당 1회 새 row 가 들어오므로 60초 stale 은 충분히 허용 가능.</p>
  *
  * <p>외화 4종(USD/JPY/CNY/EUR) 만 조회 대상. KRW 는 기준 통화라 환율이 없음.</p>
+ *
+ * <p>캐시 키 전략: 같은 캐시에 들어가는 키 충돌을 막기 위해 prefix 를 명시한다.</p>
+ * <ul>
+ *   <li>전체 조회: {@code "ALL"}</li>
+ *   <li>단건 조회: {@code "CURRENCY:USD"} 등</li>
+ * </ul>
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ExchangeRateService {
 
     private static final List<Currency> SUPPORTED_FOREX = List.of(
@@ -45,8 +49,7 @@ public class ExchangeRateService {
 
         List<ExchangeRateResponse> list = SUPPORTED_FOREX.stream()
                 .map(repository::findTopByCurrencyOrderByCollectedAtDesc)
-                .filter(java.util.Optional::isPresent)
-                .map(java.util.Optional::get)
+                .flatMap(Optional::stream)
                 .map(ExchangeRateResponse::from)
                 .toList();
 
@@ -57,7 +60,7 @@ public class ExchangeRateService {
      * 단일 통화 최신 환율 조회.
      * 데이터가 없으면 EXCHANGE_RATE_NOT_FOUND.
      */
-    @Cacheable(value = CacheConfig.LATEST_EXCHANGE_RATES, key = "#currency")
+    @Cacheable(value = CacheConfig.LATEST_EXCHANGE_RATES, key = "'CURRENCY:' + #currency.name()")
     public ExchangeRateResponse getLatest(Currency currency) {
         log.info("{} 단일 통화 환율 조회 (캐시 미스) currency={}", LoggingPatterns.BIZ_EVENT, currency);
 
@@ -69,9 +72,5 @@ public class ExchangeRateService {
                             ExchangeRateErrorCode.EXCHANGE_RATE_NOT_FOUND,
                             "환율 정보 없음: currency=" + currency);
                 });
-    }
-
-    static List<Currency> supportedForex() {
-        return Arrays.asList(SUPPORTED_FOREX.toArray(new Currency[0]));
     }
 }

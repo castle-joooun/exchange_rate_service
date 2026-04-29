@@ -6,13 +6,11 @@ import com.switchwon.api.dto.ExchangeRateResponse;
 import com.switchwon.api.service.ExchangeRateService;
 import com.switchwon.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/exchange-rate")
