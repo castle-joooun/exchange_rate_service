@@ -47,7 +47,7 @@ class KoreaeximExchangeRateClientTest {
         server = MockRestServiceServer.bindTo(builder).build();
         restClient = builder.build();
 
-        properties = new KoreaeximProperties(BASE_URL, AUTH_KEY, 3000, 5000);
+        properties = new KoreaeximProperties(BASE_URL, AUTH_KEY, 3000, 5000, List.of(12, 15, 18, 21));
         fallbackProvider = mock(ExchangeRateFallbackProvider.class);
         client = new KoreaeximExchangeRateClient(restClient, properties, fallbackProvider);
     }

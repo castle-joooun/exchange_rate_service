@@ -39,6 +39,12 @@ external:
     auth-key: ${KOREAEXIM_AUTH_KEY:pVGNGz83qHKoG4RdYPK3f6qJTcvwyqZJ}
     connect-timeout-ms: 3000
     read-timeout-ms: 5000
+    # 평일 매시 0분에 해당 시각이면 외부 API 호출. 그 외엔 직전 row 기반 ±0.3% 랜덤 변동.
+    call-hours:
+      - 12
+      - 15
+      - 18
+      - 21
 
 # Resilience4j 서킷브레이커
 resilience4j:
