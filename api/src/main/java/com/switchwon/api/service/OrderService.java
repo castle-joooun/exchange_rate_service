@@ -5,6 +5,8 @@ import com.switchwon.api.domain.ExchangeRateHistory;
 import com.switchwon.api.domain.Order;
 import com.switchwon.api.domain.OrderType;
 import com.switchwon.api.dto.OrderCreatedResponse;
+import com.switchwon.api.dto.OrderListItemResponse;
+import com.switchwon.api.dto.OrderListResponse;
 import com.switchwon.api.dto.OrderRequest;
 import com.switchwon.api.exception.ExchangeRateErrorCode;
 import com.switchwon.api.exception.OrderErrorCode;
@@ -19,10 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
- * 외화 매수/매도 주문 처리 서비스.
+ * 주문 처리 + 조회 서비스.
  *
+ * <p><b>placeOrder (POST /order)</b>: 매수/매도 주문</p>
  * <ol>
  *   <li>주문 통화쌍 결정 (KRW ↔ 외화 외 조합은 OrderType.resolve 가 거부)</li>
  *   <li>외화의 최신 환율 조회 (없으면 EXCHANGE_RATE_NOT_FOUND)</li>
@@ -30,10 +34,15 @@ import java.math.BigDecimal;
  *   <li>외화 → KRW 환산 (JPY 는 100엔 단위 환율을 사용해 별도 환산)</li>
  *   <li>Order 엔티티 저장 후 응답 변환</li>
  * </ol>
+ *
+ * <p><b>getOrderList (GET /order/list)</b>: 주문 내역 최신순 조회</p>
+ *
+ * <p>트랜잭션: 클래스 기본 readOnly. 쓰기 메서드는 placeOrder 만 @Transactional 로 오버라이드.</p>
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderService {
 
     /**
@@ -45,7 +54,7 @@ public class OrderService {
     private final ExchangeRateHistoryRepository exchangeRateRepository;
     private final OrderRepository orderRepository;
 
-    @Transactional
+    @Transactional  // 클래스 기본 readOnly 를 override
     public OrderCreatedResponse placeOrder(OrderRequest request) {
         log.info("{} 주문 처리 시작 forexAmount={} from={} to={}",
                 LoggingPatterns.BIZ_EVENT,
@@ -114,5 +123,23 @@ public class OrderService {
                 appliedRate);
 
         return OrderCreatedResponse.from(saved);
+    }
+
+    /**
+     * 전체 주문 내역 조회. 최신순(createdAt DESC) 정렬.
+     *
+     * <p>운영 환경에서는 페이지네이션이 필수지만, 과제 스펙은 단순 List 반환을 명시한다.
+     * 트랜잭션은 클래스 기본값(readOnly)을 그대로 사용한다.</p>
+     */
+    public OrderListResponse getOrderList() {
+        log.info("{} 주문 내역 조회 시작", LoggingPatterns.BIZ_EVENT);
+
+        List<OrderListItemResponse> items = orderRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(OrderListItemResponse::from)
+                .toList();
+
+        log.info("{} 주문 내역 조회 완료 count={}", LoggingPatterns.BIZ_EVENT, items.size());
+        return OrderListResponse.of(items);
     }
 }

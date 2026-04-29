@@ -2,6 +2,8 @@ package com.switchwon.api.controller;
 
 import com.switchwon.api.domain.Currency;
 import com.switchwon.api.dto.OrderCreatedResponse;
+import com.switchwon.api.dto.OrderListItemResponse;
+import com.switchwon.api.dto.OrderListResponse;
 import com.switchwon.api.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,11 +15,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -107,5 +111,43 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(orderService, never()).placeOrder(any());
+    }
+
+    @Test
+    @DisplayName("GET_order_list는_orderList_배열을_returnObject로_감싸_반환한다")
+    void GET_order_list는_orderList_배열을_returnObject로_감싸_반환한다() throws Exception {
+        LocalDateTime at = LocalDateTime.of(2026, 4, 28, 12, 0);
+        when(orderService.getOrderList()).thenReturn(new OrderListResponse(List.of(
+                new OrderListItemResponse(2L,
+                        new BigDecimal("133"), Currency.USD,
+                        new BigDecimal("196104"), Currency.KRW,
+                        new BigDecimal("1474.47"), at),
+                new OrderListItemResponse(1L,
+                        new BigDecimal("296086"), Currency.KRW,
+                        new BigDecimal("200"), Currency.USD,
+                        new BigDecimal("1480.43"), at)
+        )));
+
+        mockMvc.perform(get("/order/list").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("OK"))
+                .andExpect(jsonPath("$.returnObject.orderList.length()").value(2))
+                .andExpect(jsonPath("$.returnObject.orderList[0].id").value(2))
+                .andExpect(jsonPath("$.returnObject.orderList[0].fromCurrency").value("USD"))
+                .andExpect(jsonPath("$.returnObject.orderList[0].toAmount").value(196104))
+                .andExpect(jsonPath("$.returnObject.orderList[1].id").value(1))
+                .andExpect(jsonPath("$.returnObject.orderList[1].fromCurrency").value("KRW"))
+                .andExpect(jsonPath("$.returnObject.orderList[1].toAmount").value(200));
+    }
+
+    @Test
+    @DisplayName("GET_order_list_빈_리스트도_정상_200_응답이다")
+    void GET_order_list_빈_리스트도_정상_200_응답이다() throws Exception {
+        when(orderService.getOrderList()).thenReturn(new OrderListResponse(List.of()));
+
+        mockMvc.perform(get("/order/list").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("OK"))
+                .andExpect(jsonPath("$.returnObject.orderList.length()").value(0));
     }
 }

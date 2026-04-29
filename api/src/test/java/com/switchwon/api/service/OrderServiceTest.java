@@ -6,6 +6,7 @@ import com.switchwon.api.domain.Order;
 import com.switchwon.api.domain.OrderType;
 import com.switchwon.api.dto.OrderRequest;
 import com.switchwon.api.dto.OrderCreatedResponse;
+import com.switchwon.api.dto.OrderListResponse;
 import com.switchwon.api.exception.ExchangeRateErrorCode;
 import com.switchwon.api.exception.OrderErrorCode;
 import com.switchwon.api.repository.ExchangeRateHistoryRepository;
@@ -19,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -183,6 +185,49 @@ class OrderServiceTest {
         assertThat(response.fromAmount()).isEqualByComparingTo("21000");
         assertThat(response.toAmount()).isEqualByComparingTo("100");
         assertThat(response.tradeRate()).isEqualByComparingTo("210.00");
+    }
+
+    @Test
+    @DisplayName("getOrderList는_repository_순서를_보존하며_모든_필드를_DTO에_매핑한다")
+    void getOrderList는_repository_순서를_보존하며_모든_필드를_DTO에_매핑한다() {
+        Order o1 = Order.create(
+                new BigDecimal("296086"), Currency.KRW,
+                new BigDecimal("200"), Currency.USD,
+                new BigDecimal("1480.43"));
+        Order o2 = Order.create(
+                new BigDecimal("133"), Currency.USD,
+                new BigDecimal("196104"), Currency.KRW,
+                new BigDecimal("1474.47"));
+        when(orderRepository.findAllByOrderByCreatedAtDesc())
+                .thenReturn(List.of(o2, o1));
+
+        OrderListResponse response = service.getOrderList();
+
+        assertThat(response.orderList()).hasSize(2);
+
+        var first = response.orderList().get(0);
+        assertThat(first.fromAmount()).isEqualByComparingTo("133");
+        assertThat(first.fromCurrency()).isEqualTo(Currency.USD);
+        assertThat(first.toAmount()).isEqualByComparingTo("196104");
+        assertThat(first.toCurrency()).isEqualTo(Currency.KRW);
+        assertThat(first.tradeRate()).isEqualByComparingTo("1474.47");
+
+        var second = response.orderList().get(1);
+        assertThat(second.fromAmount()).isEqualByComparingTo("296086");
+        assertThat(second.fromCurrency()).isEqualTo(Currency.KRW);
+        assertThat(second.toAmount()).isEqualByComparingTo("200");
+        assertThat(second.toCurrency()).isEqualTo(Currency.USD);
+        assertThat(second.tradeRate()).isEqualByComparingTo("1480.43");
+    }
+
+    @Test
+    @DisplayName("getOrderList는_repository가_빈_리스트를_반환하면_빈_orderList를_반환한다")
+    void getOrderList는_repository가_빈_리스트를_반환하면_빈_orderList를_반환한다() {
+        when(orderRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of());
+
+        OrderListResponse response = service.getOrderList();
+
+        assertThat(response.orderList()).isEmpty();
     }
 
     private void stubLatestRate(Currency currency, String tradeStanRate) {

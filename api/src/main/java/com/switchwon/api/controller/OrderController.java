@@ -1,11 +1,13 @@
 package com.switchwon.api.controller;
 
 import com.switchwon.api.dto.OrderCreatedResponse;
+import com.switchwon.api.dto.OrderListResponse;
 import com.switchwon.api.dto.OrderRequest;
 import com.switchwon.api.service.OrderService;
 import com.switchwon.common.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,5 +23,10 @@ public class OrderController {
     @PostMapping
     public ApiResponse<OrderCreatedResponse> placeOrder(@Valid @RequestBody OrderRequest request) {
         return ApiResponse.success(orderService.placeOrder(request));
+    }
+
+    @GetMapping("/list")
+    public ApiResponse<OrderListResponse> getOrderList() {
+        return ApiResponse.success(orderService.getOrderList());
     }
 }
