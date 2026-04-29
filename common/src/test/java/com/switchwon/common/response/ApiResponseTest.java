@@ -22,7 +22,7 @@ class ApiResponseTest {
         ApiResponse<String> response = ApiResponse.success("hello");
 
         assertThat(response.getCode()).isEqualTo("OK");
-        assertThat(response.getMessage()).isEqualTo("성공");
+        assertThat(response.getMessage()).isEqualTo("SUCCESS");
         assertThat(response.getReturnObject()).isEqualTo("hello");
     }
 

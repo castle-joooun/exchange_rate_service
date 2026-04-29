@@ -119,30 +119,30 @@ class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("GET_order_list는_orderList_배열을_returnObject로_감싸_반환한다")
-    void GET_order_list는_orderList_배열을_returnObject로_감싸_반환한다() throws Exception {
+    @DisplayName("GET_order_list는_id_오름차순_orderList를_returnObject로_감싸_반환한다")
+    void GET_order_list는_id_오름차순_orderList를_returnObject로_감싸_반환한다() throws Exception {
         LocalDateTime at = LocalDateTime.of(2026, 4, 28, 12, 0);
         when(orderService.getOrderList()).thenReturn(new OrderListResponse(List.of(
-                new OrderListItemResponse(2L,
-                        new BigDecimal("133"), Currency.USD,
-                        new BigDecimal("196104"), Currency.KRW,
-                        new BigDecimal("1474.47"), at),
                 new OrderListItemResponse(1L,
                         new BigDecimal("296086"), Currency.KRW,
                         new BigDecimal("200"), Currency.USD,
-                        new BigDecimal("1480.43"), at)
+                        new BigDecimal("1480.43"), at),
+                new OrderListItemResponse(2L,
+                        new BigDecimal("133"), Currency.USD,
+                        new BigDecimal("196104"), Currency.KRW,
+                        new BigDecimal("1474.47"), at)
         )));
 
         mockMvc.perform(get("/order/list").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("OK"))
                 .andExpect(jsonPath("$.returnObject.orderList.length()").value(2))
-                .andExpect(jsonPath("$.returnObject.orderList[0].id").value(2))
-                .andExpect(jsonPath("$.returnObject.orderList[0].fromCurrency").value("USD"))
-                .andExpect(jsonPath("$.returnObject.orderList[0].toAmount").value(196104))
-                .andExpect(jsonPath("$.returnObject.orderList[1].id").value(1))
-                .andExpect(jsonPath("$.returnObject.orderList[1].fromCurrency").value("KRW"))
-                .andExpect(jsonPath("$.returnObject.orderList[1].toAmount").value(200));
+                .andExpect(jsonPath("$.returnObject.orderList[0].id").value(1))
+                .andExpect(jsonPath("$.returnObject.orderList[0].fromCurrency").value("KRW"))
+                .andExpect(jsonPath("$.returnObject.orderList[0].toAmount").value(200))
+                .andExpect(jsonPath("$.returnObject.orderList[1].id").value(2))
+                .andExpect(jsonPath("$.returnObject.orderList[1].fromCurrency").value("USD"))
+                .andExpect(jsonPath("$.returnObject.orderList[1].toAmount").value(196104));
     }
 
     @Test

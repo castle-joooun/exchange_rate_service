@@ -126,7 +126,7 @@ public class OrderService {
     }
 
     /**
-     * 전체 주문 내역 조회. 최신순(createdAt DESC) 정렬.
+     * 전체 주문 내역 조회. id 오름차순 정렬 (생성 순서와 동일).
      *
      * <p>운영 환경에서는 페이지네이션이 필수지만, 과제 스펙은 단순 List 반환을 명시한다.
      * 트랜잭션은 클래스 기본값(readOnly)을 그대로 사용한다.</p>
@@ -134,7 +134,7 @@ public class OrderService {
     public OrderListResponse getOrderList() {
         log.info("{} 주문 내역 조회 시작", LoggingPatterns.BIZ_EVENT);
 
-        List<OrderListItemResponse> items = orderRepository.findAllByOrderByCreatedAtDesc()
+        List<OrderListItemResponse> items = orderRepository.findAllByOrderByIdAsc()
                 .stream()
                 .map(OrderListItemResponse::from)
                 .toList();

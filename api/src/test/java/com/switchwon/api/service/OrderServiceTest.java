@@ -198,32 +198,33 @@ class OrderServiceTest {
                 new BigDecimal("133"), Currency.USD,
                 new BigDecimal("196104"), Currency.KRW,
                 new BigDecimal("1474.47"));
-        when(orderRepository.findAllByOrderByCreatedAtDesc())
-                .thenReturn(List.of(o2, o1));
+        // Repository 가 id ASC 로 반환한다고 가정 (오래된 순)
+        when(orderRepository.findAllByOrderByIdAsc())
+                .thenReturn(List.of(o1, o2));
 
         OrderListResponse response = service.getOrderList();
 
         assertThat(response.orderList()).hasSize(2);
 
         var first = response.orderList().get(0);
-        assertThat(first.fromAmount()).isEqualByComparingTo("133");
-        assertThat(first.fromCurrency()).isEqualTo(Currency.USD);
-        assertThat(first.toAmount()).isEqualByComparingTo("196104");
-        assertThat(first.toCurrency()).isEqualTo(Currency.KRW);
-        assertThat(first.tradeRate()).isEqualByComparingTo("1474.47");
+        assertThat(first.fromAmount()).isEqualByComparingTo("296086");
+        assertThat(first.fromCurrency()).isEqualTo(Currency.KRW);
+        assertThat(first.toAmount()).isEqualByComparingTo("200");
+        assertThat(first.toCurrency()).isEqualTo(Currency.USD);
+        assertThat(first.tradeRate()).isEqualByComparingTo("1480.43");
 
         var second = response.orderList().get(1);
-        assertThat(second.fromAmount()).isEqualByComparingTo("296086");
-        assertThat(second.fromCurrency()).isEqualTo(Currency.KRW);
-        assertThat(second.toAmount()).isEqualByComparingTo("200");
-        assertThat(second.toCurrency()).isEqualTo(Currency.USD);
-        assertThat(second.tradeRate()).isEqualByComparingTo("1480.43");
+        assertThat(second.fromAmount()).isEqualByComparingTo("133");
+        assertThat(second.fromCurrency()).isEqualTo(Currency.USD);
+        assertThat(second.toAmount()).isEqualByComparingTo("196104");
+        assertThat(second.toCurrency()).isEqualTo(Currency.KRW);
+        assertThat(second.tradeRate()).isEqualByComparingTo("1474.47");
     }
 
     @Test
     @DisplayName("getOrderList는_repository가_빈_리스트를_반환하면_빈_orderList를_반환한다")
     void getOrderList는_repository가_빈_리스트를_반환하면_빈_orderList를_반환한다() {
-        when(orderRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of());
+        when(orderRepository.findAllByOrderByIdAsc()).thenReturn(List.of());
 
         OrderListResponse response = service.getOrderList();
 

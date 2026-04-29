@@ -49,7 +49,7 @@ class ExchangeRateControllerTest {
         mockMvc.perform(get("/exchange-rate/latest").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("OK"))
-                .andExpect(jsonPath("$.message").value("성공"))
+                .andExpect(jsonPath("$.message").value("SUCCESS"))
                 .andExpect(jsonPath("$.returnObject.exchangeRateList.length()").value(2))
                 .andExpect(jsonPath("$.returnObject.exchangeRateList[0].currency").value("USD"))
                 .andExpect(jsonPath("$.returnObject.exchangeRateList[0].buyRate").value(1551.32))
