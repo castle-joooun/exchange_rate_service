@@ -62,10 +62,4 @@ springdoc:
   api-docs:
     path: /api-docs
 
-logging:
-  level:
-    root: INFO
-    com.switchwon: DEBUG
-    org.hibernate.SQL: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [traceId=%X{traceId:-NONE}] %-5level %logger{36} - %msg%n"
+# 로깅 설정은 logback-spring.xml 에서 관리한다 (패턴, 레벨, traceId).

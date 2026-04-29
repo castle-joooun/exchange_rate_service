@@ -4,12 +4,14 @@ import com.switchwon.api.domain.Currency;
 import com.switchwon.api.dto.OrderCreatedResponse;
 import com.switchwon.api.dto.OrderListItemResponse;
 import com.switchwon.api.dto.OrderListResponse;
+import com.switchwon.api.exception.GlobalExceptionHandler;
 import com.switchwon.api.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = OrderController.class)
+@Import(GlobalExceptionHandler.class)
 class OrderControllerTest {
 
     @Autowired
@@ -62,14 +65,16 @@ class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("forexAmount가_0이면_400_BadRequest_응답이다")
-    void forexAmount가_0이면_400_BadRequest_응답이다() throws Exception {
+    @DisplayName("forexAmount가_0이면_400_COMMON_001_JSON_응답이다")
+    void forexAmount가_0이면_400_COMMON_001_JSON_응답이다() throws Exception {
         mockMvc.perform(post("/order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "forexAmount": 0, "fromCurrency": "KRW", "toCurrency": "USD" }
                                 """))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("COMMON_001"))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("forexAmount")));
 
         verify(orderService, never()).placeOrder(any());
     }

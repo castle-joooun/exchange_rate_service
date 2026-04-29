@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+        traceId 패턴: MdcFilter 가 요청마다 발급한 traceId 를 모든 로그에 자동 포함시킨다.
+        스케줄러 등 MDC 가 비어 있는 컨텍스트는 NONE 으로 표시.
+    -->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [traceId=%X{traceId:-NONE}] %-5level %logger{36} - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        과제 범위에서는 콘솔 로깅으로 충분.
+        운영 환경에서는 RollingFileAppender 를 추가해 일자별 로테이션 + 압축을 적용한다.
+    -->
+
+    <!-- 우리 도메인 로그 — 모든 환경에서 INFO 이상 -->
+    <logger name="com.switchwon" level="INFO"/>
+
+    <!--
+        SQL / Hibernate 바인딩 로그는 환경별로 분기.
+        - local/dev/test/default: SQL 과 파라미터 바인딩까지 모두 출력 (디버깅 용이)
+        - prod: 아예 OFF (성능 + 민감정보 노출 방지)
+    -->
+    <springProfile name="local,dev,test,default">
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <logger name="org.hibernate.SQL" level="OFF"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="OFF"/>
+    </springProfile>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

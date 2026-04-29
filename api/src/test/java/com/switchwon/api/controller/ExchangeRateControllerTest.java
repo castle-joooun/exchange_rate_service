@@ -9,8 +9,10 @@ import com.switchwon.common.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.switchwon.api.exception.GlobalExceptionHandler;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,13 +20,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ExchangeRateController.class)
+@Import(GlobalExceptionHandler.class)
 class ExchangeRateControllerTest {
 
     @Autowired
@@ -72,23 +74,23 @@ class ExchangeRateControllerTest {
     }
 
     @Test
-    @DisplayName("GET_exchange_rate_latest_KRW는_BusinessException을_그대로_propagate한다")
-    void GET_exchange_rate_latest_KRW는_BusinessException을_그대로_propagate한다() throws Exception {
-        // Issue #9 의 GlobalExceptionHandler 가 없으므로 컨트롤러는 예외를 던지는 데까지가 책임.
-        // 응답 변환은 #9 에서 검증한다.
+    @DisplayName("GET_exchange_rate_latest_KRW는_404_RATE_001_JSON_응답으로_변환된다")
+    void GET_exchange_rate_latest_KRW는_404_RATE_001_JSON_응답으로_변환된다() throws Exception {
         when(exchangeRateService.getLatest(Currency.KRW))
                 .thenThrow(new BusinessException(
                         ExchangeRateErrorCode.EXCHANGE_RATE_NOT_FOUND, "환율 정보 없음: currency=KRW"));
 
-        assertThatThrownBy(() ->
-                mockMvc.perform(get("/exchange-rate/latest/KRW").accept(MediaType.APPLICATION_JSON)))
-                .hasRootCauseInstanceOf(BusinessException.class);
+        mockMvc.perform(get("/exchange-rate/latest/KRW").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("RATE_001"))
+                .andExpect(jsonPath("$.message").value("환율 정보 없음: currency=KRW"));
     }
 
     @Test
-    @DisplayName("잘못된_통화_코드는_400_Bad_Request를_반환한다")
-    void 잘못된_통화_코드는_400_Bad_Request를_반환한다() throws Exception {
+    @DisplayName("잘못된_통화_코드는_400_COMMON_001_JSON_응답을_반환한다")
+    void 잘못된_통화_코드는_400_COMMON_001_JSON_응답을_반환한다() throws Exception {
         mockMvc.perform(get("/exchange-rate/latest/INVALID").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("COMMON_001"));
     }
 }
