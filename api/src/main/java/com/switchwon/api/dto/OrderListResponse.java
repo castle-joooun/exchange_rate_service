@@ -1,5 +1,7 @@
 package com.switchwon.api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
 /**
@@ -15,7 +17,9 @@ import java.util.List;
  * }
  * </pre>
  */
+@Schema(description = "주문 내역 조회 응답")
 public record OrderListResponse(
+        @Schema(description = "최신순으로 정렬된 주문 목록")
         List<OrderListItemResponse> orderList
 ) {
 

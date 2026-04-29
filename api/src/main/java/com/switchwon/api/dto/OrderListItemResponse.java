@@ -2,6 +2,7 @@ package com.switchwon.api.dto;
 
 import com.switchwon.api.domain.Currency;
 import com.switchwon.api.domain.Order;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,13 +23,27 @@ import java.time.LocalDateTime;
  * }
  * </pre>
  */
+@Schema(description = "주문 내역 한 건")
 public record OrderListItemResponse(
+        @Schema(description = "주문 PK", example = "1")
         Long id,
+
+        @Schema(description = "출금 금액", example = "296086")
         BigDecimal fromAmount,
+
+        @Schema(description = "출금 통화", example = "KRW")
         Currency fromCurrency,
+
+        @Schema(description = "입금 금액", example = "200")
         BigDecimal toAmount,
+
+        @Schema(description = "입금 통화", example = "USD")
         Currency toCurrency,
+
+        @Schema(description = "주문 시점에 적용된 환율", example = "1480.43")
         BigDecimal tradeRate,
+
+        @Schema(description = "주문 처리 시각", example = "2026-04-28T12:00:00")
         LocalDateTime dateTime
 ) {
 
